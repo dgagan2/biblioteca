@@ -1,0 +1,91 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model book {
+  id Int @id @default(autoincrement())
+  name String
+  id_editorial book_editorial[]
+  id_author book_author[]
+  id_gender book_gender[]
+  n_pages Int?
+  edition_year DateTime
+  price Float?
+  id_location Int
+  n_edition Int?
+  stock Int @default(0)
+  id_languaje Int
+  book_code String @unique
+
+  location Location @relation(fields: [id_location], references: [id])
+  languaje Languaje @relation(fields: [id_languaje], references: [id])
+}
+
+model Editorial {
+  id Int @id @default(autoincrement())
+  name String
+  phone_number Int
+  city String
+  books book_editorial[]
+}
+model book_editorial {
+  book book @relation(fields: [book_id_editorial], references: [id])
+  book_id_editorial Int
+  editorial Editorial @relation(fields: [editorial_id], references: [id])
+  editorial_id Int
+
+  @@id([book_id_editorial, editorial_id])
+
+}
+
+model author {
+  id Int @id @default(autoincrement())
+  name String
+  surname String
+  nacionality String
+  profile_picture String
+  books book_author[]
+}
+model book_author{
+  book book @relation(fields: [book_id_author], references: [id] )
+  book_id_author Int
+  author author @relation(fields: [author_id], references: [id])
+  author_id Int
+
+  @@id([book_id_author, author_id])
+}
+
+model gender {
+  id Int @id @default(autoincrement())
+  gender String
+  books book_gender[]
+}
+model book_gender{
+  book book @relation(fields: [book_id_gender], references: [id])
+  book_id_gender Int
+  gender gender @relation(fields: [gender_id], references: [id])
+  gender_id Int
+
+  @@id([book_id_gender, gender_id])
+}
+
+
+ model Location {
+  id Int @id @default(autoincrement())
+  shelf_number String
+  books book[]
+ }
+
+model Languaje {
+  id Int @id @default(autoincrement())
+  name String
+  books book[]
+}
