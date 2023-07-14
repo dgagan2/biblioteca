@@ -6,9 +6,11 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
+
+// Tablas de los libros
 
 model book {
   id Int @id @default(autoincrement())
@@ -22,11 +24,11 @@ model book {
   id_location Int
   n_edition Int?
   stock Int @default(0)
-  id_languaje Int
+  id_language book_language[]
   book_code String @unique
-
-  location Location @relation(fields: [id_location], references: [id])
-  languaje Languaje @relation(fields: [id_languaje], references: [id])
+  caratula String // debe ser un arreglo
+  location location @relation(fields: [id_location], references: [id])
+  lending lending_book[]
 }
 
 model Editorial {
@@ -77,15 +79,87 @@ model book_gender{
   @@id([book_id_gender, gender_id])
 }
 
+model location {
+id Int @id @default(autoincrement())
+shelf_number String @unique
+books book[]
+}
 
- model Location {
-  id Int @id @default(autoincrement())
-  shelf_number String
-  books book[]
- }
-
-model Languaje {
+model language {
   id Int @id @default(autoincrement())
   name String
-  books book[]
+  books book_language[]
+}
+model book_language{
+  books book @relation(fields: [book_id_language], references: [id])
+  book_id_language Int
+  languaje language @relation(fields: [language_id], references: [id])
+  language_id Int
+
+  @@id([book_id_language, language_id])
+}
+
+model aud_book{
+  id Int @id @default(autoincrement())
+  name_book String
+  code_book String
+  edited_field String
+  createdAt DateTime @default(now())
+}
+
+// Tablas del usuario
+
+model people {
+  id Int @id
+  name String
+  surname String
+  residence String?
+  phone_number String?
+  id_user Int
+  user user @relation(fields: [id_user], references: [id])
+  lending lending[]
+  createdAt DateTime @default(now())
+}
+model user{
+  id Int @id @default(autoincrement())
+  email String @unique
+  password String
+  id_role role[]
+  id_state state[]
+  profile people[]
+}
+model role{
+  id Int @id @default(autoincrement())
+  role String
+  id_user Int
+  user user @relation(fields: [id_user], references: [id])
+}
+model state{
+  id Int @id @default(autoincrement())
+  state String
+  id_user Int
+  user user @relation(fields: [id_user], references: [id])
+}
+
+// Tabla de prestamos
+
+model lending{
+  id Int @id @default(autoincrement())
+  id_book lending_book[]
+  id_people Int
+  people people @relation(fields: [id_people], references: [id])
+  createdAt DateTime @default(now())
+  returnAt DateTime?
+  user_sesion String
+  state String
+}
+
+// Relaciones entre tablas principales
+
+model lending_book{
+  lending lending @relation(fields: [lending_id_book], references: [id])
+  lending_id_book Int
+  books book @relation(fields: [book_id], references: [id])
+  book_id Int
+  @@id([lending_id_book, book_id])
 }
