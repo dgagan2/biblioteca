@@ -15,88 +15,56 @@ datasource db {
 model book {
   id Int @id @default(autoincrement())
   name String
-  id_editorial book_editorial[]
-  id_author book_author[]
-  id_gender book_gender[]
+  description String?
+  editorial editorial[]
+  author author[]
+  gender gender[]
   n_pages Int?
-  edition_year DateTime
+  edition_year String?
   price Float?
   id_location Int
   n_edition Int?
   stock Int @default(0)
-  id_language book_language[]
+  language language[]
   book_code String @unique
   caratula String // debe ser un arreglo
   location location @relation(fields: [id_location], references: [id])
-  lending lending_book[]
+  lending lending[]
 }
 
-model Editorial {
+model editorial {
   id Int @id @default(autoincrement())
   name String
-  phone_number Int
-  city String
-  books book_editorial[]
-}
-model book_editorial {
-  book book @relation(fields: [book_id_editorial], references: [id])
-  book_id_editorial Int
-  editorial Editorial @relation(fields: [editorial_id], references: [id])
-  editorial_id Int
-
-  @@id([book_id_editorial, editorial_id])
-
+  phone_number String?
+  city String?
+  books book[]
 }
 
 model author {
   id Int @id @default(autoincrement())
   name String
-  surname String
-  nacionality String
-  profile_picture String
-  books book_author[]
-}
-model book_author{
-  book book @relation(fields: [book_id_author], references: [id] )
-  book_id_author Int
-  author author @relation(fields: [author_id], references: [id])
-  author_id Int
-
-  @@id([book_id_author, author_id])
+  surname String?
+  nacionality String?
+  profile_picture String?
+  books book[]
 }
 
 model gender {
   id Int @id @default(autoincrement())
   gender String
-  books book_gender[]
-}
-model book_gender{
-  book book @relation(fields: [book_id_gender], references: [id])
-  book_id_gender Int
-  gender gender @relation(fields: [gender_id], references: [id])
-  gender_id Int
-
-  @@id([book_id_gender, gender_id])
+  books book[]
 }
 
 model location {
-id Int @id @default(autoincrement())
-shelf_number String @unique
-books book[]
+  id Int @id @default(autoincrement())
+  shelf_number String @unique
+  books book[]
 }
 
 model language {
   id Int @id @default(autoincrement())
   name String
-  books book_language[]
-}
-model book_language{
-  books book @relation(fields: [book_id_language], references: [id])
-  book_id_language Int
-  languaje language @relation(fields: [language_id], references: [id])
-  language_id Int
-
-  @@id([book_id_language, language_id])
+  books book[]
 }
 
 model aud_book{
@@ -109,57 +77,55 @@ model aud_book{
 
 // Tablas del usuario
 
-model people {
-  id Int @id
+model profile {
   name String
-  surname String
+  surname String?
   residence String?
   phone_number String?
-  id_user Int
+  age Int?
+  id_user Int @unique
   user user @relation(fields: [id_user], references: [id])
-  lending lending[]
-  createdAt DateTime @default(now())
 }
 model user{
   id Int @id @default(autoincrement())
   email String @unique
   password String
-  id_role role[]
-  id_state state[]
-  profile people[]
+  id_role role?
+  id_state state?
+  profile profile?
+  lending lending[]
+  createdAt DateTime @default(now())
 }
 model role{
   id Int @id @default(autoincrement())
   role String
-  id_user Int
+  id_user Int @unique
   user user @relation(fields: [id_user], references: [id])
 }
 model state{
   id Int @id @default(autoincrement())
   state String
-  id_user Int
+  id_user Int @unique
   user user @relation(fields: [id_user], references: [id])
 }
 
+model aud_login{
+  id Int @id @default(autoincrement())
+  user String
+  date_login DateTime @default(now())
+  date_logout DateTime ?
+}
 // Tabla de prestamos
 
 model lending{
   id Int @id @default(autoincrement())
-  id_book lending_book[]
-  id_people Int
-  people people @relation(fields: [id_people], references: [id])
+  books book[]
+  id_user Int
+  user user @relation(fields: [id_user], references: [id])
   createdAt DateTime @default(now())
   returnAt DateTime?
-  user_sesion String
+  user_session String
   state String
 }
 
 // Relaciones entre tablas principales
-
-model lending_book{
-  lending lending @relation(fields: [lending_id_book], references: [id])
-  lending_id_book Int
-  books book @relation(fields: [book_id], references: [id])
-  book_id Int
-  @@id([lending_id_book, book_id])
-}

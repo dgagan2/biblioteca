@@ -10,6 +10,7 @@ CREATE TABLE "book" (
     "stock" INTEGER NOT NULL DEFAULT 0,
     "book_code" TEXT NOT NULL,
     "caratula" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
     CONSTRAINT "book_id_location_fkey" FOREIGN KEY ("id_location") REFERENCES "location" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
@@ -73,19 +74,19 @@ CREATE TABLE "location" (
 );
 
 -- CreateTable
-CREATE TABLE "languaje" (
+CREATE TABLE "language" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     "name" TEXT NOT NULL
 );
 
 -- CreateTable
-CREATE TABLE "book_languaje" (
-    "book_id_languaje" INTEGER NOT NULL,
-    "languaje_id" INTEGER NOT NULL,
+CREATE TABLE "book_language" (
+    "book_id_language" INTEGER NOT NULL,
+    "language_id" INTEGER NOT NULL,
 
-    PRIMARY KEY ("book_id_languaje", "languaje_id"),
-    CONSTRAINT "book_languaje_book_id_languaje_fkey" FOREIGN KEY ("book_id_languaje") REFERENCES "book" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
-    CONSTRAINT "book_languaje_languaje_id_fkey" FOREIGN KEY ("languaje_id") REFERENCES "languaje" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+    PRIMARY KEY ("book_id_language", "language_id"),
+    CONSTRAINT "book_language_book_id_language_fkey" FOREIGN KEY ("book_id_language") REFERENCES "book" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "book_language_language_id_fkey" FOREIGN KEY ("language_id") REFERENCES "language" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 -- CreateTable
@@ -113,23 +114,31 @@ CREATE TABLE "people" (
 CREATE TABLE "user" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     "email" TEXT NOT NULL,
-    "password" TEXT NOT NULL
+    "password" TEXT NOT NULL,
+    "id_role" INTEGER NOT NULL,
+    "id_state" INTEGER NOT NULL,
+    CONSTRAINT "user_id_role_fkey" FOREIGN KEY ("id_role") REFERENCES "role" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "user_id_state_fkey" FOREIGN KEY ("id_state") REFERENCES "state" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 -- CreateTable
 CREATE TABLE "role" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    "role" TEXT NOT NULL,
-    "id_user" INTEGER NOT NULL,
-    CONSTRAINT "role_id_user_fkey" FOREIGN KEY ("id_user") REFERENCES "user" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+    "role" TEXT NOT NULL
 );
 
 -- CreateTable
 CREATE TABLE "state" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    "state" TEXT NOT NULL,
-    "id_user" INTEGER NOT NULL,
-    CONSTRAINT "state_id_user_fkey" FOREIGN KEY ("id_user") REFERENCES "user" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+    "state" TEXT NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "aud_login" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "user" TEXT NOT NULL,
+    "date_login" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "date_logout" DATETIME
 );
 
 -- CreateTable
