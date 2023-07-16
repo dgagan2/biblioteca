@@ -1,6 +1,21 @@
-import express from 'express'
+import { ApolloServer, gql } from 'apollo-server'
 
-const app = express()
-app.use(express.json())
-app.listen(3000)
-console.log('Server listening on port', 3000)
+// Query
+const typeDefs = gql`
+    type Query{
+        info: String!
+    }
+`
+// Resolver
+const resolvers = {
+  Query: {
+    info: () => 'This is the API biblioteca'
+  }
+}
+// Server
+const server = new ApolloServer({
+  typeDefs,
+  resolvers
+})
+// Se inicializa el server
+server.listen().then(({ url }) => console.log(`Server is running on ${url}`))
