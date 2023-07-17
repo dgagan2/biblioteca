@@ -30,6 +30,9 @@ model book {
   caratula String // debe ser un arreglo
   location location @relation(fields: [id_location], references: [id])
   lending lending[]
+  createdAt DateTime @default(now())
+  updateAt DateTime?
+  deletedAd DateTime?
 }
 
 model editorial {
@@ -38,6 +41,9 @@ model editorial {
   phone_number String?
   city String?
   books book[]
+  createdAt DateTime @default(now())
+  updateAt DateTime?
+  deletedAd DateTime?
 }
 
 model author {
@@ -47,24 +53,36 @@ model author {
   nacionality String?
   profile_picture String?
   books book[]
+  createdAt DateTime @default(now())
+  updateAt DateTime?
+  deletedAd DateTime?
 }
 
 model gender {
   id Int @id @default(autoincrement())
   gender String
   books book[]
+  createdAt DateTime @default(now())
+  updateAt DateTime?
+  deletedAd DateTime?
 }
 
 model location {
   id Int @id @default(autoincrement())
   shelf_number String @unique
   books book[]
+  createdAt DateTime @default(now())
+  updateAt DateTime?
+  deletedAd DateTime?
 }
 
 model language {
   id Int @id @default(autoincrement())
   name String
   books book[]
+  createdAt DateTime @default(now())
+  updateAt DateTime?
+  deletedAd DateTime?
 }
 
 model aud_book{
@@ -84,6 +102,9 @@ model profile {
   phone_number String?
   age Int?
   id_user Int @unique
+  createdAt DateTime @default(now())
+  updateAt DateTime?
+  deletedAd DateTime?
   user user @relation(fields: [id_user], references: [id])
 }
 model user{
@@ -95,17 +116,25 @@ model user{
   profile profile?
   lending lending[]
   createdAt DateTime @default(now())
+  updateAt DateTime?
+  deletedAd DateTime?
 }
 model role{
   id Int @id @default(autoincrement())
   role String
   id_user Int @unique
   user user @relation(fields: [id_user], references: [id])
+  createdAt DateTime @default(now())
+  updateAt DateTime?
+  deletedAd DateTime?
 }
 model state{
   id Int @id @default(autoincrement())
   state String
   id_user Int @unique
+  createdAt DateTime @default(now())
+  updateAt DateTime?
+  deletedAd DateTime?
   user user @relation(fields: [id_user], references: [id])
 }
 
@@ -126,6 +155,8 @@ model lending{
   returnAt DateTime?
   user_session String
   state String
+  updateAt DateTime?
+  deletedAd DateTime?
 }
 
 // Relaciones entre tablas principales
