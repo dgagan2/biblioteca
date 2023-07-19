@@ -17,6 +17,12 @@ const typeDefs = gql`
     location(id: Int!): Location
     languages: [Language!]!
     language(id: Int!): Language
+    users: [User!]!
+    user(id: Int!): User
+    roles: [Role!]!
+    role(id: Int!): Role
+    bookCount: Int!
+
   }
 
   type Book {
@@ -92,24 +98,88 @@ const typeDefs = gql`
     deletedAd: DateTime
   }
 
-  type Lending {
-  id: Int!
-  books:[Book!]!
-  id_user: Int!
-  createdAt: DateTime 
-  returnAt: DateTime
-  user_session: String
-  state: String
-  updateAt: DateTime
-  deletedAd: DateTime
+  type AudBook {
+    id: Int!
+    name_book: String!
+    code_book: String!
+    edited_field: String!
+    createdAt: DateTime!
   }
 
+  type Lending {
+    id: Int!
+    books:[Book!]!
+    id_user: Int!
+    createdAt: DateTime 
+    returnAt: DateTime
+    user_session: String
+    state: String
+    updateAt: DateTime
+    deletedAd: DateTime
+  }
+
+  type Profile {
+    name: String
+    surname: String
+    residence: String
+    phone_number: String
+    age: Int
+    id_user: Int!
+    createdAt: DateTime!
+    updateAt: DateTime
+    deletedAd: DateTime
+    user: User
+  }
+
+  type User{
+    id: Int!
+    email: String!
+    password: String!
+    id_role: Role
+    id_state: State
+    profile: Profile
+    lending: [Lending!]!
+    createdAt: DateTime!
+    updateAt: DateTime
+    deletedAd: DateTime
+  }
+
+  type Role{
+    id: Int!
+    role: String!
+    id_user: Int!
+    user: User!
+    createdAt: DateTime!
+    updateAt: DateTime
+    deletedAd: DateTime
+  }
+
+  type State{
+    id: Int!
+    state: String!
+    id_user: Int!
+    createdAt: DateTime!
+    updateAt: DateTime
+    deletedAd: DateTime
+    user: User
+  }
+
+  type AudLogin {
+    id: Int!
+    user: String!
+    date_login: DateTime!
+    date_logout: DateTime
+  }
   scalar DateTime
 `
 
 // Resolver
 const resolvers = {
   Query: {
+    bookCount: async (_, __, { prisma }) => {
+      const bookCount = await prisma.book.count()
+      return bookCount
+    },
     books: async (_, __, { prisma }) => {
       return prisma.book.findMany()
     },
