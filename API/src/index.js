@@ -1,8 +1,6 @@
 import { ApolloServer, gql } from 'apollo-server'
-import { PrismaClient } from '@prisma/client'
-import { v1 as uuid } from 'uuid'
-import { validarEmail, validarPassword } from './validateEmail.js'
-const prisma = new PrismaClient()
+import { prisma } from '../prisma/clientPrisma.js'
+import { createUser } from './mutation/createUser.js'
 // Query
 const typeDefs = gql`
   type Query {
@@ -10,27 +8,28 @@ const typeDefs = gql`
     bookCount: Int!
     allbooks: [Book!]!
     booksByName(searchString: String!): [Book!]!
+    allUsers: [User!]!
   }
 
   type Book {
     id: Int!
-    name: String!
+    name: String
     description: String
-    editorial: [Editorial!]!
-    author: [Author!]!
-    gender: [Gender!]!
+    editorial: [Editorial]
+    author: [Author]
+    gender: [Gender]
     n_pages: Int
     edition_year: String
     price: Float
-    id_location: Int!
+    id_location: Int
     n_edition: Int
-    stock: Int!
-    language: [Language!]!
-    book_code: String!
+    stock: Int
+    language: [Language]
+    book_code: String
     caratula: String
-    location: Location!
+    location: Location
     lending: [Lending]
-    createdAt: DateTime!
+    createdAt: DateTime
     updateAt: DateTime
     deletedAd: DateTime
   }
@@ -129,16 +128,17 @@ const typeDefs = gql`
   }
 
   type Role{
-    id: Int!
-    role: String!
-    id_user: [User]
+    id: Int
+    role: String
+    users: [User]
+    createdAt: DateTime
     updateAt: DateTime
     deletedAd: DateTime
   }
 
   type State{
-    id: Int!
-    state: String!
+    id: Int
+    state: String
     id_user: User
     updateAt: DateTime
     deletedAd: DateTime
@@ -188,95 +188,25 @@ const resolvers = {
           }
         }
       })
+    },
+    allUsers: async (_, __, { prisma }) => {
+      const allUsers = await prisma.user.findMany()
+      return allUsers
     }
+
   },
   Mutation: {
     createUser: async (_, { input }, { prisma }) => {
-      if (!isValidEmail(input.email)) {
-        throw new Error('Correo electrónico inválido.')
+      // eslint-disable-next-line no-useless-catch
+      try {
+        const newUser = await createUser(input, prisma)
+        return newUser // Devolver el nuevo usuario si todo va bien
+      } catch (error) {
+        throw error // Manejar el error y devolver un mensaje de error adecuado
       }
-      if (await existsEmail(input.email) === true) {
-        throw new Error('El correo ya existe.')
-      }
-
-      // Verificar que el campo de contraseña cumple con ciertos criterios de seguridad
-      if (!isValidPassword(input.password)) {
-        throw new Error('La contraseña debe tener al menos 8 caracteres y contener letras mayúsculas, minúsculas y caracteres especiales.')
-      }
-
-      // Validar que los campos opcionales no exceden cierta longitud máxima
-      if (input.name && input.name.length > 50) {
-        throw new Error('El nombre debe tener menos de 50 caracteres.')
-      }
-
-      if (input.surname && input.surname.length > 50) {
-        throw new Error('El apellido debe tener menos de 50 caracteres.')
-      }
-      if (Number.isInteger(parseInt(input.email)) || input.age < 0) {
-        throw new Error('La edad debe ser un número entero positivo.')
-      }
-
-      const userId = uuid()
-      const { email, password, surname, residence, name, phoneNumber, age } = input
-      const newUser = await prisma.user.create({
-        data: {
-          id: userId,
-          email,
-          password,
-          profile: {
-            create: {
-              name,
-              surname,
-              residence,
-              phoneNumber,
-              age
-            }
-          }
-        },
-        include: {
-          profile: true
-        }
-      }
-      )
-      return newUser
     }
 
   }
-}
-// validar si el correo existe
-const existsEmail = async (email) => {
-  try {
-    const user = await prisma.user.findFirst({
-      where: { email: { equals: email } }
-    })
-
-    if (user) {
-      return true
-    } else {
-      return false
-    }
-  } catch (error) {
-    // Manejar el error si ocurre algún problema en la consulta
-    console.error(error)
-    throw error
-  }
-}
-// Validar el formato del correo
-const isValidEmail = (email) => {
-  const esValido = validarEmail(email)
-  if (esValido) {
-    return true
-  } else {
-    return false
-  }
-}
-
-// Función para validar la contraseña
-function isValidPassword (password) {
-  if (validarPassword === true) {
-    return false
-  }
-  return true
 }
 
 // Server
