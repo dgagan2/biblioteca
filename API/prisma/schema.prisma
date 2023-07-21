@@ -99,20 +99,22 @@ model profile {
   name String
   surname String?
   residence String?
-  phone_number String?
+  phoneNumber String?
   age Int?
-  id_user Int @unique
+  idUser String @unique
   createdAt DateTime @default(now())
   updateAt DateTime?
   deletedAd DateTime?
-  user user @relation(fields: [id_user], references: [id])
+  user user @relation(fields: [idUser], references: [id])
 }
 model user{
-  id Int @id @default(autoincrement())
+  id String @id
   email String @unique
   password String
-  id_role role?
-  id_state state?
+  id_role Int @default(2)
+  role role @relation(fields: [id_role], references: [id])
+  id_state Int @default(1)
+  state state @relation(fields: [id_state], references: [id])
   profile profile?
   lending lending[]
   createdAt DateTime @default(now())
@@ -122,8 +124,7 @@ model user{
 model role{
   id Int @id @default(autoincrement())
   role String
-  id_user Int @unique
-  user user @relation(fields: [id_user], references: [id])
+  id_user user[]
   createdAt DateTime @default(now())
   updateAt DateTime?
   deletedAd DateTime?
@@ -131,11 +132,10 @@ model role{
 model state{
   id Int @id @default(autoincrement())
   state String
-  id_user Int @unique
+  id_user user[]
   createdAt DateTime @default(now())
   updateAt DateTime?
   deletedAd DateTime?
-  user user @relation(fields: [id_user], references: [id])
 }
 
 model aud_login{
@@ -149,8 +149,8 @@ model aud_login{
 model lending{
   id Int @id @default(autoincrement())
   books book[]
-  id_user Int
-  user user @relation(fields: [id_user], references: [id])
+  idUser String
+  user user @relation(fields: [idUser], references: [id])
   createdAt DateTime @default(now())
   returnAt DateTime?
   user_session String

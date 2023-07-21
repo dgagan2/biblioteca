@@ -1,28 +1,15 @@
 import { ApolloServer, gql } from 'apollo-server'
 import { PrismaClient } from '@prisma/client'
-
+import { v1 as uuid } from 'uuid'
+import { validarEmail, validarPassword } from './validateEmail.js'
 const prisma = new PrismaClient()
 // Query
 const typeDefs = gql`
   type Query {
     books: [Book!]!
-    book(id: Int!): Book
-    editorials: [Editorial!]!
-    editorial(id: Int!): Editorial
-    authors: [Author!]!
-    author(id: Int!): Author
-    genders: [Gender!]!
-    gender(id: Int!): Gender
-    locations: [Location!]!
-    location(id: Int!): Location
-    languages: [Language!]!
-    language(id: Int!): Language
-    users: [User!]!
-    user(id: Int!): User
-    roles: [Role!]!
-    role(id: Int!): Role
     bookCount: Int!
-
+    allbooks: [Book!]!
+    booksByName(searchString: String!): [Book!]!
   }
 
   type Book {
@@ -40,9 +27,9 @@ const typeDefs = gql`
     stock: Int!
     language: [Language!]!
     book_code: String!
-    caratula: [String!]!
+    caratula: String
     location: Location!
-    lending: [Lending!]!
+    lending: [Lending]
     createdAt: DateTime!
     updateAt: DateTime
     deletedAd: DateTime
@@ -109,7 +96,7 @@ const typeDefs = gql`
   type Lending {
     id: Int!
     books:[Book!]!
-    id_user: Int!
+    id_user: User
     createdAt: DateTime 
     returnAt: DateTime
     user_session: String
@@ -119,27 +106,24 @@ const typeDefs = gql`
   }
 
   type Profile {
-    name: String
+    name: String!
     surname: String
     residence: String
-    phone_number: String
+    phoneNumber: String
     age: Int
-    id_user: Int!
-    createdAt: DateTime!
+    idUser: User!
     updateAt: DateTime
     deletedAd: DateTime
-    user: User
   }
 
   type User{
-    id: Int!
+    id: String!
     email: String!
     password: String!
     id_role: Role
     id_state: State
     profile: Profile
-    lending: [Lending!]!
-    createdAt: DateTime!
+    lending: [Lending]
     updateAt: DateTime
     deletedAd: DateTime
   }
@@ -147,9 +131,7 @@ const typeDefs = gql`
   type Role{
     id: Int!
     role: String!
-    id_user: Int!
-    user: User!
-    createdAt: DateTime!
+    id_user: [User]
     updateAt: DateTime
     deletedAd: DateTime
   }
@@ -157,11 +139,9 @@ const typeDefs = gql`
   type State{
     id: Int!
     state: String!
-    id_user: Int!
-    createdAt: DateTime!
+    id_user: User
     updateAt: DateTime
     deletedAd: DateTime
-    user: User
   }
 
   type AudLogin {
@@ -171,6 +151,22 @@ const typeDefs = gql`
     date_logout: DateTime
   }
   scalar DateTime
+
+  type Mutation{
+    createUser(input: CreateUserInput!): User!
+  }
+   input CreateUserInput{
+      email: String!
+      password: String!
+      name: String!
+      surname: String
+      residence: String
+      phoneNumber: String
+      age: Int
+      updateAt: DateTime
+      deletedAd: DateTime
+   }
+  
 `
 
 // Resolver
@@ -180,83 +176,109 @@ const resolvers = {
       const bookCount = await prisma.book.count()
       return bookCount
     },
-    books: async (_, __, { prisma }) => {
-      return prisma.book.findMany()
+    allbooks: async (_, __, { prisma }) => {
+      const allbooks = await prisma.book.findMany()
+      return allbooks
     },
-    book: async (_, { id }, { prisma }) => {
-      return prisma.book.findUnique({
-        where: { id }
-      })
-    },
-    editorials: async (_, __, { prisma }) => {
-      return prisma.editorial.findMany()
-    },
-    editorial: async (_, { id }, { prisma }) => {
-      return prisma.editorial.findUnique({
-        where: { id }
-      })
-    },
-    authors: async (_, __, { prisma }) => {
-      return prisma.author.findMany()
-    },
-    author: async (_, { id }, { prisma }) => {
-      return prisma.author.findUnique({
-        where: { id }
-      })
-    },
-    genders: async (_, __, { prisma }) => {
-      return prisma.gender.findMany()
-    },
-    gender: async (_, { id }, { prisma }) => {
-      return prisma.gender.findUnique({
-        where: { id }
-      })
-    },
-    locations: async (_, __, { prisma }) => {
-      return prisma.location.findMany()
-    },
-    location: async (_, { id }, { prisma }) => {
-      return prisma.location.findUnique({
-        where: { id }
-      })
-    },
-    languages: async (_, __, { prisma }) => {
-      return prisma.language.findMany()
-    },
-    language: async (_, { id }, { prisma }) => {
-      return prisma.language.findUnique({
-        where: { id }
+    booksByName: async (_, { searchString }, { prisma }) => {
+      return prisma.book.findMany({
+        where: {
+          name: {
+            contains: searchString
+          }
+        }
       })
     }
   },
-  Book: {
-    editorial: async (parent, _, { prisma }) => {
-      return prisma.editorial.findMany({
-        where: { id: parent.id }
-      })
-    },
-    author: async (parent, _, { prisma }) => {
-      return prisma.author.findMany({
-        where: { id: parent.id }
-      })
-    },
-    gender: async (parent, _, { prisma }) => {
-      return prisma.gender.findMany({
-        where: { id: parent.id }
-      })
-    },
-    location: async (parent, _, { prisma }) => {
-      return prisma.location.findUnique({
-        where: { id: parent.id_location }
-      })
-    },
-    language: async (parent, _, { prisma }) => {
-      return prisma.language.findMany({
-        where: { id: parent.id }
-      })
+  Mutation: {
+    createUser: async (_, { input }, { prisma }) => {
+      if (!isValidEmail(input.email)) {
+        throw new Error('Correo electrónico inválido.')
+      }
+      if (await existsEmail(input.email) === true) {
+        throw new Error('El correo ya existe.')
+      }
+
+      // Verificar que el campo de contraseña cumple con ciertos criterios de seguridad
+      if (!isValidPassword(input.password)) {
+        throw new Error('La contraseña debe tener al menos 8 caracteres y contener letras mayúsculas, minúsculas y caracteres especiales.')
+      }
+
+      // Validar que los campos opcionales no exceden cierta longitud máxima
+      if (input.name && input.name.length > 50) {
+        throw new Error('El nombre debe tener menos de 50 caracteres.')
+      }
+
+      if (input.surname && input.surname.length > 50) {
+        throw new Error('El apellido debe tener menos de 50 caracteres.')
+      }
+      if (Number.isInteger(parseInt(input.email)) || input.age < 0) {
+        throw new Error('La edad debe ser un número entero positivo.')
+      }
+
+      const userId = uuid()
+      const { email, password, surname, residence, name, phoneNumber, age } = input
+      const newUser = await prisma.user.create({
+        data: {
+          id: userId,
+          email,
+          password,
+          profile: {
+            create: {
+              name,
+              surname,
+              residence,
+              phoneNumber,
+              age
+            }
+          }
+        },
+        include: {
+          profile: true
+        }
+      }
+      )
+      return newUser
     }
+
   }
 }
+// validar si el correo existe
+const existsEmail = async (email) => {
+  try {
+    const user = await prisma.user.findFirst({
+      where: { email: { equals: email } }
+    })
+
+    if (user) {
+      return true
+    } else {
+      return false
+    }
+  } catch (error) {
+    // Manejar el error si ocurre algún problema en la consulta
+    console.error(error)
+    throw error
+  }
+}
+// Validar el formato del correo
+const isValidEmail = (email) => {
+  const esValido = validarEmail(email)
+  if (esValido) {
+    return true
+  } else {
+    return false
+  }
+}
+
+// Función para validar la contraseña
+function isValidPassword (password) {
+  if (validarPassword === true) {
+    return false
+  }
+  return true
+}
+
 // Server
 const server = new ApolloServer({
   typeDefs,
