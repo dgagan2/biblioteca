@@ -2,6 +2,8 @@
 import { ApolloServer, gql } from 'apollo-server'
 import { prisma } from '../prisma/clientPrisma.js'
 import { createUser } from './mutation/createUser.js'
+import { createRole, createState } from './mutation/user/create.js'
+import { createGender, createLanguage } from './mutation/book/create.js'
 // Query
 const typeDefs = gql`
   type Query {
@@ -164,6 +166,7 @@ const typeDefs = gql`
     createState(input: CreateStateInput!): State!
     createLanguage(input: CreateLanguageInput!): Language!
     createLocation(input: CreateLocationInput!): Location!
+    createGender(input: CreateGenderInput!): Gender!
   }
   input CreateUserInput{
     email: String!
@@ -187,6 +190,9 @@ const typeDefs = gql`
   }
   input CreateLocationInput{
     shelfNumber: String!
+  }
+  input CreateGenderInput{
+    gender: String!
   }
   
 `
@@ -239,15 +245,7 @@ const resolvers = {
     },
     createRole: async (_, { input }, { prisma }) => {
       try {
-        if (input.role.length < 3) {
-          throw new Error('Valide el nombre del rol')
-        }
-        const { role } = input
-        const newRole = await prisma.role.create({
-          data: {
-            role
-          }
-        })
+        const newRole = await createRole(input, prisma)
         return newRole
       } catch (error) {
         throw error
@@ -255,15 +253,7 @@ const resolvers = {
     },
     createState: async (_, { input }, { prisma }) => {
       try {
-        if (input.state.length < 3) {
-          throw new Error('Valide la informacion')
-        }
-        const { state } = input
-        const newState = await prisma.state.create({
-          data: {
-            state
-          }
-        })
+        const newState = await createState(input, prisma)
         return newState
       } catch (error) {
         throw error
@@ -271,15 +261,7 @@ const resolvers = {
     },
     createLanguage: async (_, { input }, { prisma }) => {
       try {
-        if (input.language.length < 3) {
-          throw new Error('Valide la informacion')
-        }
-        const { name } = input
-        const newLanguage = await prisma.language.create({
-          data: {
-            name
-          }
-        })
+        const newLanguage = await createLanguage(input, prisma)
         return newLanguage
       } catch (error) {
         throw error
@@ -287,16 +269,16 @@ const resolvers = {
     },
     createLocation: async (_, { input }, { prisma }) => {
       try {
-        if (input.location.length < 3) {
-          throw new Error('Valide la informacion')
-        }
-        const { shelfNumber } = input
-        const newLocation = await prisma.location.create({
-          data: {
-            shelfNumber
-          }
-        })
-        return newLocation
+        const newLanguage = await createLanguage(input, prisma)
+        return newLanguage
+      } catch (error) {
+        throw error
+      }
+    },
+    createGender: async (_, { input }, { prisma }) => {
+      try {
+        const newGender = await createGender(input, prisma)
+        return newGender
       } catch (error) {
         throw error
       }
