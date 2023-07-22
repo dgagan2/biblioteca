@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-catch */
 import { ApolloServer, gql } from 'apollo-server'
 import { prisma } from '../prisma/clientPrisma.js'
 import { createUser } from './mutation/createUser.js'
@@ -68,7 +69,7 @@ const typeDefs = gql`
 
   type Location {
     id: Int!
-    shelf_number: String!
+    shelfNumber: String!
     books: [Book!]!
     createdAt: DateTime!
     updateAt: DateTime
@@ -132,8 +133,8 @@ const typeDefs = gql`
   }
 
   type Role{
-    id: Int
-    role: String
+    id: Int!
+    role: String!
     id_user: [User!]!
     createdAt: DateTime
     updateAt: DateTime
@@ -142,8 +143,9 @@ const typeDefs = gql`
 
   type State{
     id: Int
-    state: String
+    state: String!
     id_user: [User!]!
+    createdAt: DateTime!
     updateAt: DateTime
     deletedAd: DateTime
   }
@@ -158,18 +160,34 @@ const typeDefs = gql`
 
   type Mutation{
     createUser(input: CreateUserInput!): User!
+    createRole(input: CreateRoleInput!): Role!
+    createState(input: CreateStateInput!): State!
+    createLanguage(input: CreateLanguageInput!): Language!
+    createLocation(input: CreateLocationInput!): Location!
   }
-   input CreateUserInput{
-      email: String!
-      password: String!
-      name: String!
-      surname: String
-      residence: String
-      phoneNumber: String
-      age: Int
-      updateAt: DateTime
-      deletedAd: DateTime
-   }
+  input CreateUserInput{
+    email: String!
+    password: String!
+    name: String!
+    surname: String
+    residence: String
+    phoneNumber: String
+    age: Int
+    updateAt: DateTime
+    deletedAd: DateTime
+  }
+  input CreateRoleInput{
+    role: String!
+  }
+  input CreateStateInput{
+    state: String!
+  }
+  input CreateLanguageInput{
+    name: String!
+  }
+  input CreateLocationInput{
+    shelfNumber: String!
+  }
   
 `
 
@@ -217,6 +235,70 @@ const resolvers = {
         return newUser // Devolver el nuevo usuario si todo va bien
       } catch (error) {
         throw error // Manejar el error y devolver un mensaje de error adecuado
+      }
+    },
+    createRole: async (_, { input }, { prisma }) => {
+      try {
+        if (input.role.length < 3) {
+          throw new Error('Valide el nombre del rol')
+        }
+        const { role } = input
+        const newRole = await prisma.role.create({
+          data: {
+            role
+          }
+        })
+        return newRole
+      } catch (error) {
+        throw error
+      }
+    },
+    createState: async (_, { input }, { prisma }) => {
+      try {
+        if (input.state.length < 3) {
+          throw new Error('Valide la informacion')
+        }
+        const { state } = input
+        const newState = await prisma.state.create({
+          data: {
+            state
+          }
+        })
+        return newState
+      } catch (error) {
+        throw error
+      }
+    },
+    createLanguage: async (_, { input }, { prisma }) => {
+      try {
+        if (input.language.length < 3) {
+          throw new Error('Valide la informacion')
+        }
+        const { name } = input
+        const newLanguage = await prisma.language.create({
+          data: {
+            name
+          }
+        })
+        return newLanguage
+      } catch (error) {
+        throw error
+      }
+    },
+    createLocation: async (_, { input }, { prisma }) => {
+      try {
+        if (input.location.length < 3) {
+          throw new Error('Valide la informacion')
+        }
+        const { shelfNumber } = input
+        const newLocation = await prisma.location.create({
+          data: {
+            shelfNumber
+          }
+        })
+        return newLocation
+      } catch (error) {
+        throw error
       }
     }
 
