@@ -37,7 +37,7 @@ model book {
 
 model editorial {
   id Int @id @default(autoincrement())
-  name String
+  name String @unique
   phone_number String?
   city String?
   books book[]
@@ -60,7 +60,7 @@ model author {
 
 model gender {
   id Int @id @default(autoincrement())
-  gender String
+  gender String @unique
   books book[]
   createdAt DateTime @default(now())
   updateAt DateTime?
@@ -78,7 +78,7 @@ model location {
 
 model language {
   id Int @id @default(autoincrement())
-  name String
+  name String @unique
   books book[]
   createdAt DateTime @default(now())
   updateAt DateTime?
@@ -123,7 +123,7 @@ model user{
 }
 model role{
   id Int @id @default(autoincrement())
-  role String
+  role String @unique
   id_user user[]
   createdAt DateTime @default(now())
   updateAt DateTime?
@@ -131,7 +131,7 @@ model role{
 }
 model state{
   id Int @id @default(autoincrement())
-  state String
+  state String @unique
   id_user user[]
   createdAt DateTime @default(now())
   updateAt DateTime?
