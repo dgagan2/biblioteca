@@ -13,7 +13,7 @@ const typeDefs = gql`
 
   type Book {
     id: Int!
-    name: String
+    name: String!
     description: String
     editorial: [Editorial]
     author: [Author]
@@ -95,7 +95,8 @@ const typeDefs = gql`
   type Lending {
     id: Int!
     books:[Book!]!
-    id_user: User
+    idUser: String!
+    user: User!
     createdAt: DateTime 
     returnAt: DateTime
     user_session: String
@@ -110,17 +111,20 @@ const typeDefs = gql`
     residence: String
     phoneNumber: String
     age: Int
-    idUser: User!
+    idUser: String
     updateAt: DateTime
     deletedAd: DateTime
+    user: User!
   }
 
   type User{
     id: String!
     email: String!
     password: String!
-    id_role: Role
-    id_state: State
+    id_role: Int!
+    role: Role!
+    id_state: Int!
+    state: State!
     profile: Profile
     lending: [Lending]
     updateAt: DateTime
@@ -130,7 +134,7 @@ const typeDefs = gql`
   type Role{
     id: Int
     role: String
-    users: [User]
+    id_user: [User!]!
     createdAt: DateTime
     updateAt: DateTime
     deletedAd: DateTime
@@ -139,7 +143,7 @@ const typeDefs = gql`
   type State{
     id: Int
     state: String
-    id_user: User
+    id_user: [User!]!
     updateAt: DateTime
     deletedAd: DateTime
   }
@@ -189,9 +193,19 @@ const resolvers = {
         }
       })
     },
-    allUsers: async (_, __, { prisma }) => {
-      const allUsers = await prisma.user.findMany()
-      return allUsers
+    allUsers: async () => {
+      try {
+        const Users = await prisma.user.findMany({
+          include: {
+            profile: true,
+            state: true,
+            role: true
+          }
+        })
+        return Users
+      } catch (error) {
+        throw new Error('Error de consulta')
+      }
     }
 
   },
