@@ -16,19 +16,19 @@ model book {
   id Int @id @default(autoincrement())
   name String
   description String?
-  editorial editorial[]
-  author author[]
-  gender gender[]
-  n_pages Int?
-  edition_year String?
+  editorialId editorial[]
+  authorId author[]
+  genderId gender[]
+  nPages Int?
+  editionYear String?
   price Float?
-  id_location Int
-  n_edition Int?
+  idLocation Int
+  nEdition Int?
   stock Int @default(0)
-  language language[]
-  book_code String @unique
+  languageId language[]
+  bookCode String @unique
   caratula String // debe ser un arreglo
-  location location @relation(fields: [id_location], references: [id])
+  location location @relation(fields: [idLocation], references: [id])
   lending lending[]
   createdAt DateTime @default(now())
   updateAt DateTime?
@@ -38,7 +38,7 @@ model book {
 model editorial {
   id Int @id @default(autoincrement())
   name String @unique
-  phone_number String?
+  phoneNumber String?
   city String?
   books book[]
   createdAt DateTime @default(now())
@@ -51,7 +51,7 @@ model author {
   name String
   surname String?
   nacionality String?
-  profile_picture String?
+  profilePicture String?
   books book[]
   createdAt DateTime @default(now())
   updateAt DateTime?
@@ -87,9 +87,9 @@ model language {
 
 model aud_book{
   id Int @id @default(autoincrement())
-  name_book String
-  code_book String
-  edited_field String
+  nameBook String
+  codeBook String
+  editedField String
   createdAt DateTime @default(now())
 }
 
@@ -111,10 +111,10 @@ model user{
   id String @id
   email String @unique
   password String
-  id_role Int @default(2)
-  role role @relation(fields: [id_role], references: [id])
-  id_state Int @default(1)
-  state state @relation(fields: [id_state], references: [id])
+  idRole Int @default(2)
+  role role @relation(fields: [idRole], references: [id])
+  idState Int @default(1)
+  state state @relation(fields: [idState], references: [id])
   profile profile?
   lending lending[]
   createdAt DateTime @default(now())
@@ -124,7 +124,7 @@ model user{
 model role{
   id Int @id @default(autoincrement())
   role String @unique
-  id_user user[]
+  idUser user[]
   createdAt DateTime @default(now())
   updateAt DateTime?
   deletedAd DateTime?
@@ -132,7 +132,7 @@ model role{
 model state{
   id Int @id @default(autoincrement())
   state String @unique
-  id_user user[]
+  idUser user[]
   createdAt DateTime @default(now())
   updateAt DateTime?
   deletedAd DateTime?
@@ -141,8 +141,8 @@ model state{
 model aud_login{
   id Int @id @default(autoincrement())
   user String
-  date_login DateTime @default(now())
-  date_logout DateTime ?
+  dateLogin DateTime @default(now())
+  dateLogout DateTime ?
 }
 // Tabla de prestamos
 
@@ -153,7 +153,7 @@ model lending{
   user user @relation(fields: [idUser], references: [id])
   createdAt DateTime @default(now())
   returnAt DateTime?
-  user_session String
+  userSession String
   state String
   updateAt DateTime?
   deletedAd DateTime?

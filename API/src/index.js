@@ -3,7 +3,8 @@ import { ApolloServer, gql } from 'apollo-server'
 import { prisma } from '../prisma/clientPrisma.js'
 import { createUser } from './mutation/createUser.js'
 import { createRole, createState } from './mutation/user/create.js'
-import { createGender, createLanguage } from './mutation/book/create.js'
+import { createAuthor, createEditorial, createGender, createLanguage, createLocation } from './mutation/book/create.js'
+import { createBook } from './mutation/book/createBooks.js'
 // Query
 const typeDefs = gql`
   type Query {
@@ -18,17 +19,17 @@ const typeDefs = gql`
     id: Int!
     name: String!
     description: String
-    editorial: [Editorial]
-    author: [Author]
-    gender: [Gender]
-    n_pages: Int
-    edition_year: String
+    editorialId: [Editorial]
+    authorId: [Author]
+    genderId: [Gender]
+    nPages: Int
+    editionYear: String
     price: Float
-    id_location: Int
-    n_edition: Int
+    idLocation: Int
+    nEdition: Int
     stock: Int
-    language: [Language]
-    book_code: String
+    languageId: [Language]
+    bookCode: String
     caratula: String
     location: Location
     lending: [Lending]
@@ -40,7 +41,7 @@ const typeDefs = gql`
   type Editorial {
     id: Int!
     name: String!
-    phone_number: String
+    phoneNumber: String
     city: String
     books: [Book!]!
     createdAt: DateTime!
@@ -53,7 +54,7 @@ const typeDefs = gql`
     name: String!
     surname: String
     nacionality: String
-    profile_picture: String
+    profilePicture: String
     books: [Book!]!
     createdAt: DateTime!
     updateAt: DateTime
@@ -89,9 +90,9 @@ const typeDefs = gql`
 
   type AudBook {
     id: Int!
-    name_book: String!
-    code_book: String!
-    edited_field: String!
+    nameBook: String!
+    codeBook: String!
+    editedField: String!
     createdAt: DateTime!
   }
 
@@ -102,7 +103,7 @@ const typeDefs = gql`
     user: User!
     createdAt: DateTime 
     returnAt: DateTime
-    user_session: String
+    userSession: String
     state: String
     updateAt: DateTime
     deletedAd: DateTime
@@ -124,9 +125,9 @@ const typeDefs = gql`
     id: String!
     email: String!
     password: String!
-    id_role: Int!
+    idRole: Int!
     role: Role!
-    id_state: Int!
+    idState: Int!
     state: State!
     profile: Profile
     lending: [Lending]
@@ -137,7 +138,7 @@ const typeDefs = gql`
   type Role{
     id: Int!
     role: String!
-    id_user: [User!]!
+    idUser: [User!]!
     createdAt: DateTime
     updateAt: DateTime
     deletedAd: DateTime
@@ -146,7 +147,7 @@ const typeDefs = gql`
   type State{
     id: Int
     state: String!
-    id_user: [User!]!
+    idUser: [User!]!
     createdAt: DateTime!
     updateAt: DateTime
     deletedAd: DateTime
@@ -155,8 +156,8 @@ const typeDefs = gql`
   type AudLogin {
     id: Int!
     user: String!
-    date_login: DateTime!
-    date_logout: DateTime
+    dateLogin: DateTime!
+    dateLogout: DateTime
   }
   scalar DateTime
 
@@ -167,6 +168,9 @@ const typeDefs = gql`
     createLanguage(input: CreateLanguageInput!): Language!
     createLocation(input: CreateLocationInput!): Location!
     createGender(input: CreateGenderInput!): Gender!
+    createAuthor(input: CreateAuthorInput!): Author!
+    createEditorial(input: CreateEditorialInput!): Editorial!
+    createBook(input: CreateBookInput!): Book!
   }
   input CreateUserInput{
     email: String!
@@ -193,6 +197,33 @@ const typeDefs = gql`
   }
   input CreateGenderInput{
     gender: String!
+  }
+  input CreateAuthorInput{
+    name: String!
+    surname: String!
+    nacionality: String
+    profilePicture: String
+  }
+  input CreateEditorialInput{
+    name: String!
+    phoneNumber: String
+    city: String
+  }
+  input CreateBookInput{
+    name: String!
+    description: String
+    editorialId: Int
+    authorId: Int
+    genderId: Int
+    nPages: Int
+    editionYear: String
+    price: Float
+    idLocation: Int
+    nEdition: Int
+    stock: Int
+    languageId: Int
+    bookCode: String
+    caratula: String
   }
   
 `
@@ -269,7 +300,7 @@ const resolvers = {
     },
     createLocation: async (_, { input }, { prisma }) => {
       try {
-        const newLanguage = await createLanguage(input, prisma)
+        const newLanguage = await createLocation(input, prisma)
         return newLanguage
       } catch (error) {
         throw error
@@ -279,6 +310,30 @@ const resolvers = {
       try {
         const newGender = await createGender(input, prisma)
         return newGender
+      } catch (error) {
+        throw error
+      }
+    },
+    createAuthor: async (_, { input }, { prisma }) => {
+      try {
+        const newAuthor = await createAuthor(input, prisma)
+        return newAuthor
+      } catch (error) {
+        throw error
+      }
+    },
+    createEditorial: async (_, { input }, { prisma }) => {
+      try {
+        const newEditorial = await createEditorial(input, prisma)
+        return newEditorial
+      } catch (error) {
+        throw error
+      }
+    },
+    createBook: async (_, { input }, { prisma }) => {
+      try {
+        const newBook = await createBook(input, prisma)
+        return newBook
       } catch (error) {
         throw error
       }

@@ -3,25 +3,25 @@ CREATE TABLE "book" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     "name" TEXT NOT NULL,
     "description" TEXT,
-    "n_pages" INTEGER,
-    "edition_year" TEXT,
+    "nPages" INTEGER,
+    "editionYear" TEXT,
     "price" REAL,
-    "id_location" INTEGER NOT NULL,
-    "n_edition" INTEGER,
+    "idLocation" INTEGER NOT NULL,
+    "nEdition" INTEGER,
     "stock" INTEGER NOT NULL DEFAULT 0,
-    "book_code" TEXT NOT NULL,
+    "bookCode" TEXT NOT NULL,
     "caratula" TEXT NOT NULL,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updateAt" DATETIME,
     "deletedAd" DATETIME,
-    CONSTRAINT "book_id_location_fkey" FOREIGN KEY ("id_location") REFERENCES "location" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+    CONSTRAINT "book_idLocation_fkey" FOREIGN KEY ("idLocation") REFERENCES "location" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 -- CreateTable
 CREATE TABLE "editorial" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     "name" TEXT NOT NULL,
-    "phone_number" TEXT,
+    "phoneNumber" TEXT,
     "city" TEXT,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updateAt" DATETIME,
@@ -34,7 +34,7 @@ CREATE TABLE "author" (
     "name" TEXT NOT NULL,
     "surname" TEXT,
     "nacionality" TEXT,
-    "profile_picture" TEXT,
+    "profilePicture" TEXT,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updateAt" DATETIME,
     "deletedAd" DATETIME
@@ -52,7 +52,7 @@ CREATE TABLE "gender" (
 -- CreateTable
 CREATE TABLE "location" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    "shelf_number" TEXT NOT NULL,
+    "shelfNumber" TEXT NOT NULL,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updateAt" DATETIME,
     "deletedAd" DATETIME
@@ -70,9 +70,9 @@ CREATE TABLE "language" (
 -- CreateTable
 CREATE TABLE "aud_book" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    "name_book" TEXT NOT NULL,
-    "code_book" TEXT NOT NULL,
-    "edited_field" TEXT NOT NULL,
+    "nameBook" TEXT NOT NULL,
+    "codeBook" TEXT NOT NULL,
+    "editedField" TEXT NOT NULL,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -95,13 +95,13 @@ CREATE TABLE "user" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
-    "id_role" INTEGER NOT NULL DEFAULT 2,
-    "id_state" INTEGER NOT NULL DEFAULT 1,
+    "idRole" INTEGER NOT NULL DEFAULT 2,
+    "idState" INTEGER NOT NULL DEFAULT 1,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updateAt" DATETIME,
     "deletedAd" DATETIME,
-    CONSTRAINT "user_id_role_fkey" FOREIGN KEY ("id_role") REFERENCES "role" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
-    CONSTRAINT "user_id_state_fkey" FOREIGN KEY ("id_state") REFERENCES "state" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+    CONSTRAINT "user_idRole_fkey" FOREIGN KEY ("idRole") REFERENCES "role" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "user_idState_fkey" FOREIGN KEY ("idState") REFERENCES "state" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 -- CreateTable
@@ -126,8 +126,8 @@ CREATE TABLE "state" (
 CREATE TABLE "aud_login" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     "user" TEXT NOT NULL,
-    "date_login" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "date_logout" DATETIME
+    "dateLogin" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "dateLogout" DATETIME
 );
 
 -- CreateTable
@@ -136,7 +136,7 @@ CREATE TABLE "lending" (
     "idUser" TEXT NOT NULL,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "returnAt" DATETIME,
-    "user_session" TEXT NOT NULL,
+    "userSession" TEXT NOT NULL,
     "state" TEXT NOT NULL,
     "updateAt" DATETIME,
     "deletedAd" DATETIME,
@@ -184,16 +184,31 @@ CREATE TABLE "_authorTobook" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "book_book_code_key" ON "book"("book_code");
+CREATE UNIQUE INDEX "book_bookCode_key" ON "book"("bookCode");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "location_shelf_number_key" ON "location"("shelf_number");
+CREATE UNIQUE INDEX "editorial_name_key" ON "editorial"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "gender_gender_key" ON "gender"("gender");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "location_shelfNumber_key" ON "location"("shelfNumber");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "language_name_key" ON "language"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "profile_idUser_key" ON "profile"("idUser");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "user_email_key" ON "user"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "role_role_key" ON "role"("role");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "state_state_key" ON "state"("state");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "_bookToeditorial_AB_unique" ON "_bookToeditorial"("A", "B");

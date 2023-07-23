@@ -2,13 +2,13 @@
 import { prisma } from '../../../prisma/clientPrisma.js'
 
 export async function createLanguage (input, prisma) {
-  if (input.language.length < 3) {
-    throw new Error('Valide la informacion')
+  const { name } = input
+  if (name.length < 3) {
+    throw new Error('El nombre debe tener mas de 3 letras')
   }
   if (await existslanguage(input.name)) {
     throw new Error('El idioma ya existe')
   }
-  const { name } = input
   const newLanguage = await prisma.language.create({
     data: {
       name
@@ -18,8 +18,8 @@ export async function createLanguage (input, prisma) {
 }
 
 export async function createLocation (input, prisma) {
-  if (input.location.length < 3) {
-    throw new Error('Valide la informacion')
+  if (input.shelfNumber.length < 2) {
+    throw new Error('El campo debe tener minimo 2 letras')
   }
   if (await existsLocation(input.shelfNumber)) {
     throw new Error('La ubicación ya existe')
@@ -35,7 +35,7 @@ export async function createLocation (input, prisma) {
 
 export async function createGender (input, prisma) {
   if (input.gender.length < 3) {
-    throw new Error('Valide la informacion')
+    throw new Error('El genero debe tener mas de 3 letras')
   }
   if (await existsGender(input.gender)) {
     throw new Error('El genero ya existe')
@@ -47,6 +47,42 @@ export async function createGender (input, prisma) {
     }
   })
   return newGender
+}
+
+export async function createAuthor (input, prisma) {
+  const { name, surname, nacionality, profilePicture } = input
+  if (name && surname.length < 3) {
+    throw new Error('El nombre o apellido deben tener mas de 3 letras')
+  }
+  if (await existsAuthor(name, surname)) {
+    throw new Error('El autor ya existe')
+  }
+  const newAuthor = await prisma.author.create({
+    data: {
+      name,
+      surname,
+      nacionality,
+      profilePicture
+    }
+  })
+  return newAuthor
+}
+
+export async function createEditorial (input, prisma) {
+  const { name, phoneNumber, city } = input
+
+  if (name.length < 3) {
+    throw new Error('El nombre debe tener mas de 3 letras')
+  }
+  if (await existsEditorial(name)) {
+    throw new Error('La editorial ya existe')
+  }
+  const newEditorial = await prisma.editorial.create({
+    data: {
+      name, phoneNumber, city
+    }
+  })
+  return newEditorial
 }
 
 const existslanguage = async (language) => {
@@ -90,6 +126,37 @@ const existsGender = async (gender) => {
     })
 
     if (Gender) {
+      return true
+    } else {
+      return false
+    }
+  } catch (error) {
+    // Manejar el error si ocurre algún problema en la consulta
+    throw error
+  }
+}
+const existsAuthor = async (name, surname) => {
+  try {
+    const Author = await prisma.author.findFirst({
+      where: { name, surname: { equals: name && surname } }
+    })
+
+    if (Author) {
+      return true
+    } else {
+      return false
+    }
+  } catch (error) {
+    // Manejar el error si ocurre algún problema en la consulta
+    throw error
+  }
+}
+const existsEditorial = async (name) => {
+  try {
+    const Editorial = await prisma.editorial.findFirst({
+      where: { name: { equals: name } }
+    })
+    if (Editorial) {
       return true
     } else {
       return false
