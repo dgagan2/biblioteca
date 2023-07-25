@@ -25,17 +25,17 @@ export async function createBook (input, prisma) {
     data: {
       name,
       description,
-      editorialId: {
+      editorial: {
         connect: {
           id: editorialId
         }
       },
-      authorId: {
+      author: {
         connect: {
           id: authorId
         }
       },
-      genderId: {
+      gender: {
         connect: {
           id: genderId
         }
@@ -50,7 +50,7 @@ export async function createBook (input, prisma) {
       },
       nEdition,
       stock,
-      languageId: {
+      language: {
         connect: {
           id: languageId
         }
@@ -59,6 +59,7 @@ export async function createBook (input, prisma) {
       caratula
     }
   })
+
   return newBook
 }
 // Se valida que el nombre del libro no exista con una editorial en especifico
