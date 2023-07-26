@@ -8,10 +8,17 @@ import { createBook } from './mutation/book/createBooks.js'
 // Query
 const typeDefs = gql`
   type Query {
-    books: [Book!]!
     bookCount: Int!
     allbooks: [Book!]!
     booksByName(searchString: String!): [Book!]!
+    allEditorial: [Editorial!]!
+    editorialByName(searchString: String!): [Editorial!]!
+    allAuthors: [Author!]!
+    authorByName(searchedAuthor: String!): [Author!]!
+    allGender: [Gender!]!
+    genderByName(searchedGender: String!): [Gender!]!
+    allLocation:[Location!]!
+    locationByName(searchedLocation: String!): [Location!]!
     allUsers: [User!]!
   }
 
@@ -235,15 +242,56 @@ const resolvers = {
       const bookCount = await prisma.book.count()
       return bookCount
     },
-    allbooks: async (_, __, { prisma }) => {
-      const allbooks = await prisma.book.findMany()
-      return allbooks
+    allbooks: async () => {
+      return await prisma.book.findMany()
     },
     booksByName: async (_, { searchString }, { prisma }) => {
       return prisma.book.findMany({
         where: {
           name: {
             contains: searchString
+          }
+        }
+      })
+    },
+    allEditorial: async () => {
+      return await prisma.editorial.findMany()
+    },
+    editorialByName: async (_, { searchString }) => {
+      return prisma.editorial.findMany({
+        where: {
+          name: {
+            contains: searchString
+          }
+        }
+      })
+    },
+    allAuthors: async () => { return await prisma.author.findMany() },
+    authorByName: async (_, { searchedAuthor }) => {
+      return prisma.author.findMany({
+        where: {
+          name: {
+            contains: searchedAuthor
+          }
+        }
+      })
+    },
+    allGender: async () => { return await prisma.gender.findMany() },
+    genderByName: async (_, { searchedGender }) => {
+      return prisma.gender.findMany({
+        where: {
+          gender: {
+            contains: searchedGender
+          }
+        }
+      })
+    },
+    allLocation: async () => { return await prisma.location.findMany() },
+    locationByName: async (_, { searchedLocation }) => {
+      return prisma.location.findMany({
+        where: {
+          shelfNumber: {
+            contains: searchedLocation
           }
         }
       })

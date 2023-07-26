@@ -16,7 +16,9 @@ export async function createBook (input, prisma) {
   if (await validateName(name, editorialId)) {
     throw new Error('El libro ya existe')
   }
-  if (bookCode.length > 0) {
+  if (!bookCode) {
+    throw new Error('El codigo del libro es obligatorio')
+  } else {
     if (await validateCode(bookCode)) {
       throw new Error('El codigo del libro ya existe')
     }
@@ -25,17 +27,17 @@ export async function createBook (input, prisma) {
     data: {
       name,
       description,
-      editorial: {
+      editorialId: {
         connect: {
           id: editorialId
         }
       },
-      author: {
+      authorId: {
         connect: {
           id: authorId
         }
       },
-      gender: {
+      genderId: {
         connect: {
           id: genderId
         }
@@ -50,7 +52,7 @@ export async function createBook (input, prisma) {
       },
       nEdition,
       stock,
-      language: {
+      languageId: {
         connect: {
           id: languageId
         }
@@ -59,7 +61,6 @@ export async function createBook (input, prisma) {
       caratula
     }
   })
-
   return newBook
 }
 // Se valida que el nombre del libro no exista con una editorial en especifico
