@@ -2,39 +2,40 @@
 import { v1 as uuid } from 'uuid'
 import { validarEmail, validarPassword } from '../validations/validateCreateUser.js'
 import { prisma } from '../../prisma/clientPrisma.js'
-
+import bcrypt from 'bcrypt'
 export async function createUser (input, prisma) {
-  if (!isValidEmail(input.email)) {
+  const { email, password, surname, residence, name, phoneNumber, age } = input
+  if (!isValidEmail(email)) {
     throw new Error('Correo electrónico inválido.')
   }
-  if (await existsEmail(input.email) === true) {
+  if (await existsEmail(email) === true) {
     throw new Error('El correo ya existe')
   }
 
   // Verificar que el campo de contraseña cumple con ciertos criterios de seguridad
-  if (!isValidPassword(input.password)) {
+  if (!isValidPassword(password)) {
     throw new Error('La contraseña debe tener al menos 8 caracteres y contener letras mayúsculas, minúsculas y caracteres especiales.')
   }
-
+  const newPassword = await bcrypt.hash(password, 5)
   // Validar que los campos opcionales no exceden cierta longitud máxima
-  if (input.name && input.name.length > 50) {
+  if (name && name.length > 50) {
     throw new Error('El nombre debe tener menos de 50 caracteres.')
   }
 
-  if (input.surname && input.surname.length > 50) {
+  if (surname && surname.length > 50) {
     throw new Error('El apellido debe tener menos de 50 caracteres.')
   }
-  if (Number.isInteger(parseInt(input.email)) || input.age < 0) {
+  if (Number.isInteger(parseInt(email)) || age < 0) {
     throw new Error('La edad debe ser un número entero positivo.')
   }
 
   const userId = uuid()
-  const { email, password, surname, residence, name, phoneNumber, age } = input
+
   const newUser = await prisma.user.create({
     data: {
       id: userId,
       email,
-      password,
+      password: newPassword,
       profile: {
         create: {
           name,
