@@ -4,6 +4,7 @@ import { createUser } from '../mutation/createUser.js'
 import { createRole, createState } from '../mutation/user/create.js'
 import { createAuthor, createEditorial, createGender, createLanguage, createLocation } from '../mutation/book/create.js'
 import { createBook } from '../mutation/book/createBooks.js'
+import { Login } from '../services/login.js'
 
 export const resolvers = {
   Query: {
@@ -78,6 +79,10 @@ export const resolvers = {
       } catch (error) {
         throw new Error('Error de consulta')
       }
+    },
+    login: async (_, { email, password }) => {
+      const { user, token } = await Login(email, password)
+      return { user, token }
     }
 
   },

@@ -14,8 +14,12 @@ export const typeDefs = gql`
     allLocation:[Location!]!
     locationByName(searchedLocation: String!): [Location!]!
     allUsers: [User!]!
+    login(email:String!, password: String!):AuthPayload
   }
-
+  type AuthPayload {
+    user: User!
+    token: String!
+  }
   type Book {
     id: Int!
     name: String!
@@ -163,7 +167,7 @@ export const typeDefs = gql`
   scalar DateTime
 
   type Mutation{
-    createUser(input: CreateUserInput!): User!
+    createUser(input: CreateUserInput!): User! 
     createRole(input: CreateRoleInput!): Role!
     createState(input: CreateStateInput!): State!
     createLanguage(input: CreateLanguageInput!): Language!
