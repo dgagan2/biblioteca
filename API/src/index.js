@@ -1,3 +1,4 @@
+/* eslint-disable n/handle-callback-err */
 /* eslint-disable no-useless-catch */
 import { ApolloServer } from 'apollo-server-express'
 import express from 'express'
@@ -7,14 +8,30 @@ import { resolvers } from './resolvers/resolvers.js'
 import { routerAPI } from './routes/indexRoutes.js'
 import passport from 'passport'
 import { permissions } from './services/apolloAuthorization/authorization.js'
+import jwtStrategy from './services/strategies/jwt.strategy.js'
 
 // Server
 export const app = express()
 app.use(express.json())
 app.use(passport.initialize())
 app.get('/', (req, res) => res.send('Welcome'))
-// app.use('/static', express.static(path.join(__dirname, '../public')))
-app.set('/graphql', passport.authenticate('jwt', { session: false }))
+passport.use(jwtStrategy)
+
+export const authenticateMiddleware = (req, res, next) => {
+  if (!req.headers.authorization) {
+    return res.status(401).json('No autorizado')
+  }
+  passport.authenticate('jwt', { session: false }, (err, payload) => {
+    if (!payload) {
+      return res.status(401).json('No está autorizado para acceder a este recurso')
+    }
+    req.user = payload // Almacenar el usuario en req.user
+    next()
+  })(req, res, next)
+}
+
+app.use('/graphql', authenticateMiddleware)
+
 async function start () {
   // Creo el apollo server y le paso los type y resolver
   const apolloServer = new ApolloServer({
@@ -29,8 +46,8 @@ async function start () {
 
   await apolloServer.start() // Inicializo servidor apollo
   apolloServer.applyMiddleware({ app }) // Toma un objeto donde le paso el servidor
-  // Archivo principal de manejo de rutas
   routerAPI(app)
+  // Archivo principal de manejo de rutas
   app.listen(3000, () => {
     console.log('Server is runing in port', 3000)
   })

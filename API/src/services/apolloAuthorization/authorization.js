@@ -4,10 +4,11 @@ import passport from 'passport'
 // Definir una regla para verificar si el usuario está autenticado (usando Passport)
 
 export const isAuthenticated = (parent, args, context) => {
-  console.log('entro')
   return passport.authenticate('jwt', { session: false })(context.req, context.res, context.next)
 }
-
+const isAdmin = (parent, args, { user }) => {
+  return user && user.role === 'admin'
+}
 // Definir una regla para verificar si el usuario tiene un rol específico
 const hasRole = (role) => (parent, args, { user }) => {
   return user && user.role === role
@@ -18,9 +19,9 @@ export const permissions = shield({
     // Permitir que cualquier usuario autenticado realice consultas públicas
     publicQuery: isAuthenticated,
     // Permitir que solo los usuarios con el rol 'admin' realicen consultas privadas
-    privateQuery: and(isAuthenticated, hasRole('admin')),
+    privateQuery: [isAuthenticated, isAdmin],
     allUsers: [isAuthenticated, hasRole('admin')],
-    login: [isAuthenticated, hasRole('admin')]
+    login: [isAuthenticated, isAdmin]
   },
   Mutation: {
     // Permitir que cualquier usuario autenticado realice mutaciones públicas

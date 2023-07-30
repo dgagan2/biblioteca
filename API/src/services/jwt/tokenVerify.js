@@ -1,5 +1,5 @@
 import jsonwebtoken from 'jsonwebtoken'
 
-export function verifyToken (token, secret) {
+export async function verifyToken (token, secret) {
   return jsonwebtoken.verify(token, secret)
 }
