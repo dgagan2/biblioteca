@@ -16,7 +16,7 @@ export async function Login (email, password) {
   if (!user) {
     throw new AuthenticationError('El usuario no existe')
   }
-  if (!user.state.id === 1) {
+  if (user.state.state == 'disable') {
     throw new AuthenticationError('Usuario deshabilitado')
   }
   const validatehash = await bcrypt.compare(password, user.password)
@@ -34,6 +34,7 @@ export async function Login (email, password) {
     const payload = {
       sub: user.id,
       role: user.role.role,
+      state: user.state.state,
       idSession: audLogin.id
     }
     const token = signToken(payload, secret) // Se cifra el token

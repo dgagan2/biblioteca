@@ -14,6 +14,9 @@ export const typeDefs = gql`
     allLocation:[Location!]!
     locationByName(searchedLocation: String!): [Location!]!
     allUsers: [User!]!
+    userByEmail(searchedEmail: String!): [User!]!
+    userById(searchedId: String!): [User!]!
+    userByName(searchedName: String!): [Profile!]!
     login(email:String!, password: String!):AuthPayload
   }
   type AuthPayload {
@@ -129,7 +132,7 @@ export const typeDefs = gql`
   type User{
     id: String!
     email: String!
-    password: String!
+    password: String
     idRole: Int!
     role: Role!
     idState: Int!
@@ -176,6 +179,7 @@ export const typeDefs = gql`
     createAuthor(input: CreateAuthorInput!): Author!
     createEditorial(input: CreateEditorialInput!): Editorial!
     createBook(input: CreateBookInput!): Book!
+    createLending(input: CreateLendingInput!): Lending!
   }
   input CreateUserInput{
     email: String!
@@ -229,6 +233,11 @@ export const typeDefs = gql`
     languageId: Int
     bookCode: String
     caratula: String
+  }
+  input CreateLendingInput{
+    books: [Int!]!
+    idUser: String
+    userSession: String
   }
   
 `

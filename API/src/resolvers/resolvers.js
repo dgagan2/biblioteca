@@ -5,6 +5,7 @@ import { createRole, createState } from '../mutation/user/create.js'
 import { createAuthor, createEditorial, createGender, createLanguage, createLocation } from '../mutation/book/create.js'
 import { createBook } from '../mutation/book/createBooks.js'
 import { Login } from '../services/login.js'
+import { createLending } from '../mutation/lending/createLending.js'
 
 export const resolvers = {
   Query: {
@@ -75,10 +76,47 @@ export const resolvers = {
             role: true
           }
         })
+        delete Users.password
         return Users
       } catch (error) {
         throw new Error('Error de consulta')
       }
+    },
+    userByEmail: async (_, { searchedEmail }) => {
+      return await prisma.user.findMany({
+        where: {
+          email: { contains: searchedEmail }
+        },
+        include: {
+          state: true,
+          role: true,
+          profile: true
+        }
+      })
+    },
+    userById: async (_, { searchedId }) => {
+      const user = await prisma.user.findFirst({
+        where: {
+          id: searchedId
+        },
+        include: {
+          state: true,
+          role: true,
+          profile: true
+        }
+      })
+      delete user.password
+      return [user]
+    },
+    userByName: async (_, { searchedName }) => {
+      return prisma.profile.findMany({
+        where: {
+          name: { contains: searchedName }
+        },
+        include: {
+          user: true
+        }
+      })
     },
     login: async (_, { email, password }) => {
       const { user, token } = await Login(email, password)
@@ -156,6 +194,14 @@ export const resolvers = {
       try {
         const newBook = await createBook(input, prisma)
         return newBook
+      } catch (error) {
+        throw error
+      }
+    },
+    createLending: async (parent, { input }, { prisma, user }) => {
+      try {
+        const newLending = await createLending(input, prisma, user)
+        return newLending
       } catch (error) {
         throw error
       }
