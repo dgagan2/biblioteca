@@ -11,7 +11,9 @@ export async function createUser (input, prisma) {
   if (await existsEmail(email) === true) {
     throw new Error('El correo ya existe')
   }
-
+  if (await validateRoleState() === false) {
+    throw new Error('Role o state no estan creados')
+  }
   // Verificar que el campo de contraseña cumple con ciertos criterios de seguridad
   if (!isValidPassword(password)) {
     throw new Error('La contraseña debe tener al menos 8 caracteres y contener letras mayúsculas, minúsculas y caracteres especiales.')
@@ -21,7 +23,6 @@ export async function createUser (input, prisma) {
   if (name && name.length > 50) {
     throw new Error('El nombre debe tener menos de 50 caracteres.')
   }
-
   if (surname && surname.length > 50) {
     throw new Error('El apellido debe tener menos de 50 caracteres.')
   }
@@ -67,6 +68,26 @@ const existsEmail = async (email) => {
     }
   } catch (error) {
     // Manejar el error si ocurre algún problema en la consulta
+    throw error
+  }
+}
+
+const validateRoleState = async () => {
+  try {
+    const role = await prisma.role.findFirst({
+      where: {
+        id: { equals: 2 }, role: { equals: 'customer' }
+      }
+    })
+    const state = await prisma.state.findFirst({
+      where: { id: { equals: 1 }, state: { equals: 'active' } }
+    })
+    if (role && state) {
+      return true
+    } else {
+      return false
+    }
+  } catch (error) {
     throw error
   }
 }

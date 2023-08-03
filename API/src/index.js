@@ -9,29 +9,28 @@ import { routerAPI } from './routes/indexRoutes.js'
 import passport from 'passport'
 import { permissions } from './services/apolloAuthorization/authorization.js'
 import jwtStrategy from './services/strategies/jwt.strategy.js'
-
+import { authenticateMiddleware } from './middleware/auth.handler.js'
 // Server
 export const app = express()
 app.use(express.json())
-app.use(passport.initialize())
-app.get('/', (req, res) => res.send('Welcome'))
+// app.use(passport.initialize())
 passport.use(jwtStrategy)
 
-export const authenticateMiddleware = (req, res, next) => {
-  if (!req.headers.authorization) {
-    return res.status(401).json('No autorizado')
-  }
-  passport.authenticate('jwt', { session: false }, (err, payload) => {
-    if (!payload) {
-      return res.status(401).json('No está autorizado para acceder a este recurso')
-    }
-    if (payload.state == 'disable') {
-      return res.status(401).json('No está autorizado para acceder a este recurso, usuario deshabilitado')
-    }
-    req.user = payload // Almacenar el usuario en req.user
-    next()
-  })(req, res, next)
-}
+// export const authenticateMiddleware = (req, res, next) => {
+//   if (!req.headers.authorization) {
+//     return res.status(401).json('No autorizado')
+//   }
+//   passport.authenticate('jwt', { session: false }, (err, payload) => {
+//     if (!payload) {
+//       return res.status(401).json('No está autorizado para acceder a este recurso')
+//     }
+//     if (payload.state == 'disable') {
+//       return res.status(401).json('No está autorizado para acceder a este recurso, usuario deshabilitado')
+//     }
+//     req.user = payload // Almacenar el usuario en req.user
+//     next()
+//   })(req, res, next)
+// }
 
 app.use('/graphql', authenticateMiddleware)
 

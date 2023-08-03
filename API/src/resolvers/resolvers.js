@@ -17,6 +17,9 @@ export const resolvers = {
       return await prisma.book.findMany()
     },
     booksByName: async (_, { searchString }, { prisma }) => {
+      if (!searchString) {
+        throw new Error('El valor buscado no puede estar vacio')
+      }
       return prisma.book.findMany({
         where: {
           name: {
@@ -29,6 +32,9 @@ export const resolvers = {
       return await prisma.editorial.findMany()
     },
     editorialByName: async (_, { searchString }) => {
+      if (!searchString) {
+        throw new Error('El valor buscado no puede estar vacio')
+      }
       return prisma.editorial.findMany({
         where: {
           name: {
@@ -39,6 +45,9 @@ export const resolvers = {
     },
     allAuthors: async () => { return await prisma.author.findMany() },
     authorByName: async (_, { searchedAuthor }) => {
+      if (!searchedAuthor) {
+        throw new Error('El valor buscado no puede estar vacio')
+      }
       return prisma.author.findMany({
         where: {
           name: {
@@ -49,6 +58,9 @@ export const resolvers = {
     },
     allGender: async () => { return await prisma.gender.findMany() },
     genderByName: async (_, { searchedGender }) => {
+      if (!searchedGender) {
+        throw new Error('El valor buscado no puede estar vacio')
+      }
       return prisma.gender.findMany({
         where: {
           gender: {
@@ -59,6 +71,9 @@ export const resolvers = {
     },
     allLocation: async () => { return await prisma.location.findMany() },
     locationByName: async (_, { searchedLocation }) => {
+      if (!searchedLocation) {
+        throw new Error('El valor buscado no puede estar vacio')
+      }
       return prisma.location.findMany({
         where: {
           shelfNumber: {
@@ -83,6 +98,9 @@ export const resolvers = {
       }
     },
     userByEmail: async (_, { searchedEmail }) => {
+      if (!searchedEmail) {
+        throw new Error('El valor buscado no puede estar vacio')
+      }
       return await prisma.user.findMany({
         where: {
           email: { contains: searchedEmail }
@@ -95,6 +113,9 @@ export const resolvers = {
       })
     },
     userById: async (_, { searchedId }) => {
+      if (!searchedId) {
+        throw new Error('El valor buscado no puede estar vacio')
+      }
       const user = await prisma.user.findFirst({
         where: {
           id: searchedId
@@ -109,6 +130,9 @@ export const resolvers = {
       return [user]
     },
     userByName: async (_, { searchedName }) => {
+      if (!searchedName) {
+        throw new Error('El valor buscado no puede estar vacio')
+      }
       return prisma.profile.findMany({
         where: {
           name: { contains: searchedName }
@@ -121,8 +145,52 @@ export const resolvers = {
     login: async (_, { email, password }) => {
       const { user, token } = await Login(email, password)
       return { user, token }
-    }
-
+    },
+    lendingActiveByUser: async (_, { searchedUser }) => {
+      if (!searchedUser) {
+        throw new Error('El valor buscado no puede estar vacio')
+      }
+      return prisma.lending.findMany({
+        where: {
+          userSession: { contains: searchedUser },
+          state: { equals: 'prestado' }
+        }
+      })
+    },
+    AllLendingByUser: async (_, { searchedUser }) => {
+      if (!searchedUser) {
+        throw new Error('El valor buscado no puede estar vacio')
+      }
+      return prisma.lending.findMany({
+        where: {
+          userSession: { contains: searchedUser }
+        }
+      })
+    },
+    lendingActiveByIdUser: async (_, { searchedUser }) => {
+      if (!searchedUser) {
+        throw new Error('El valor buscado no puede estar vacio')
+      }
+      return prisma.lending.findMany({
+        where: {
+          idUser: { contains: searchedUser },
+          state: { equals: 'prestado' }
+        }
+      })
+    },
+    AllLendingByIdUser: async (_, { searchedUser }) => {
+      if (!searchedUser) {
+        throw new Error('El valor buscado no puede estar vacio')
+      }
+      return prisma.lending.findMany({
+        where: {
+          idUser: { contains: searchedUser }
+        }
+      })
+    },
+    allLending: async () => { return await prisma.lending.findMany() },
+    allRole: async () => { return await prisma.role.findMany() },
+    allState: async () => { return await prisma.state.findMany() }
   },
   Mutation: {
     createUser: async (_, { input }, { prisma }) => {

@@ -1,8 +1,9 @@
-import { authenticateMiddleware } from '../index.js'
+import { authenticateMiddleware } from '../middleware/auth.handler.js'
 import { loginRouter } from './login/loginRoute.js'
 // import passport from 'passport'
 
 export const routerAPI = (app) => {
+  app.get('/', (req, res) => res.send('Welcome'))
   app.use('/graphql', authenticateMiddleware)
   app.use('/login', loginRouter)
   app.use('*', (req, res) => res.status(404).send('Not found'))

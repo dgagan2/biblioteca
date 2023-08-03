@@ -18,6 +18,13 @@ export const typeDefs = gql`
     userById(searchedId: String!): [User!]!
     userByName(searchedName: String!): [Profile!]!
     login(email:String!, password: String!):AuthPayload
+    lendingActiveByUser(searchedUser: String!):[Lending!]!
+    AllLendingByUser(searchedUser: String!):[Lending!]!
+    lendingActiveByIdUser(searchedUser: String!):[Lending!]!
+    AllLendingByIdUser(searchedUser: String!):[Lending!]!
+    allLending: [Lending!]!
+    allRole:[Role!]!
+    allState: [State!]!
   }
   type AuthPayload {
     user: User!

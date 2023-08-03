@@ -19,7 +19,7 @@ export async function createRole (input, prisma) {
 
 export async function createState (input, prisma) {
   if (input.state.length < 3) {
-    throw new Error('Valide la informacion')
+    throw new Error('El campo esta vacio')
   }
   if (await existsState(input.state)) {
     throw new Error('El estado ya existe')
