@@ -6,6 +6,7 @@ import { createAuthor, createEditorial, createGender, createLanguage, createLoca
 import { createBook } from '../mutation/book/createBooks.js'
 import { Login } from '../services/login.js'
 import { createLending } from '../mutation/lending/createLending.js'
+import { isAdmin } from '../middleware/auth.handler.js'
 
 export const resolvers = {
   Query: {
@@ -82,7 +83,10 @@ export const resolvers = {
         }
       })
     },
-    allUsers: async () => {
+    allUsers: async ({ user }) => {
+      if (!isAdmin(user.role)) {
+        throw new Error('No esta autorizado, valide el role')
+      }
       try {
         const Users = await prisma.user.findMany({
           include: {
@@ -202,7 +206,10 @@ export const resolvers = {
         throw error // Manejar el error y devolver un mensaje de error adecuado
       }
     },
-    createRole: async (_, { input }, { prisma }) => {
+    createRole: async (_, { input }, { prisma, user }) => {
+      if (!isAdmin(user.role)) {
+        throw new Error('No esta autorizado, valide el role')
+      }
       try {
         const newRole = await createRole(input, prisma)
         return newRole
@@ -210,7 +217,10 @@ export const resolvers = {
         throw error
       }
     },
-    createState: async (_, { input }, { prisma }) => {
+    createState: async (_, { input }, { prisma, user }) => {
+      if (!isAdmin(user.role)) {
+        throw new Error('No esta autorizado, valide el role')
+      }
       try {
         const newState = await createState(input, prisma)
         return newState
@@ -218,7 +228,10 @@ export const resolvers = {
         throw error
       }
     },
-    createLanguage: async (_, { input }, { prisma }) => {
+    createLanguage: async (_, { input }, { prisma, user }) => {
+      if (!isAdmin(user.role)) {
+        throw new Error('No esta autorizado, valide el role')
+      }
       try {
         const newLanguage = await createLanguage(input, prisma)
         return newLanguage
@@ -226,7 +239,10 @@ export const resolvers = {
         throw error
       }
     },
-    createLocation: async (_, { input }, { prisma }) => {
+    createLocation: async (_, { input }, { prisma, user }) => {
+      if (!isAdmin(user.role)) {
+        throw new Error('No esta autorizado, valide el role')
+      }
       try {
         const newLanguage = await createLocation(input, prisma)
         return newLanguage
@@ -234,7 +250,10 @@ export const resolvers = {
         throw error
       }
     },
-    createGender: async (_, { input }, { prisma }) => {
+    createGender: async (_, { input }, { prisma, user }) => {
+      if (!isAdmin(user.role)) {
+        throw new Error('No esta autorizado, valide el role')
+      }
       try {
         const newGender = await createGender(input, prisma)
         return newGender
@@ -242,7 +261,10 @@ export const resolvers = {
         throw error
       }
     },
-    createAuthor: async (_, { input }, { prisma }) => {
+    createAuthor: async (_, { input }, { prisma, user }) => {
+      if (!isAdmin(user.role)) {
+        throw new Error('No esta autorizado, valide el role')
+      }
       try {
         const newAuthor = await createAuthor(input, prisma)
         return newAuthor
@@ -250,7 +272,10 @@ export const resolvers = {
         throw error
       }
     },
-    createEditorial: async (_, { input }, { prisma }) => {
+    createEditorial: async (_, { input }, { prisma, user }) => {
+      if (!isAdmin(user.role)) {
+        throw new Error('No esta autorizado, valide el role')
+      }
       try {
         const newEditorial = await createEditorial(input, prisma)
         return newEditorial
@@ -258,7 +283,10 @@ export const resolvers = {
         throw error
       }
     },
-    createBook: async (_, { input }, { prisma }) => {
+    createBook: async (_, { input }, { prisma, user }) => {
+      if (!isAdmin(user.role)) {
+        throw new Error('No esta autorizado, valide el role')
+      }
       try {
         const newBook = await createBook(input, prisma)
         return newBook

@@ -23,6 +23,22 @@ export async function createBook (input, prisma) {
       throw new Error('El codigo del libro ya existe')
     }
   }
+  if (await validateIdLanguage(languageId) === false) {
+    throw new Error('El id del lenguaje no existe')
+  }
+  if (await validateIdEditorial(editorialId) === false) {
+    throw new Error('El id del editorial no existe')
+  }
+  if (await validateIdAuthor(authorId) === false) {
+    throw new Error('El id del autor no existe')
+  }
+  if (await validateIdGender(genderId) === false) {
+    throw new Error('El id del genero no existe')
+  }
+  if (await validateIdLocation(idLocation) === false) {
+    throw new Error('El id de la ubicación no existe')
+  }
+
   const newBook = await prisma.book.create({
     data: {
       name,
@@ -59,6 +75,13 @@ export async function createBook (input, prisma) {
       },
       bookCode,
       caratula
+    },
+    include: {
+      editorialId: true,
+      authorId: true,
+      genderId: true,
+      location: true,
+      languageId: true
     }
   })
   return newBook
@@ -98,6 +121,71 @@ const validateCode = async (code) => {
     } else {
       return false
     }
+  } catch (error) {
+    throw error
+  }
+}
+
+const validateIdLanguage = async (id) => {
+  try {
+    const Language = await prisma.language.findFirst({
+      where: { id }
+    })
+    if (Language) {
+      return true
+    } else { return false }
+  } catch (error) {
+    throw error
+  }
+}
+
+const validateIdEditorial = async (id) => {
+  try {
+    const Editorial = await prisma.editorial.findFirst({
+      where: { id }
+    })
+    if (Editorial) {
+      return true
+    } else { return false }
+  } catch (error) {
+    throw error
+  }
+}
+
+const validateIdAuthor = async (id) => {
+  try {
+    const Author = await prisma.author.findFirst({
+      where: { id }
+    })
+    if (Author) {
+      return true
+    } else { return false }
+  } catch (error) {
+    throw error
+  }
+}
+
+const validateIdGender = async (id) => {
+  try {
+    const Gender = await prisma.gender.findFirst({
+      where: { id }
+    })
+    if (Gender) {
+      return true
+    } else { return false }
+  } catch (error) {
+    throw error
+  }
+}
+
+const validateIdLocation = async (id) => {
+  try {
+    const Location = await prisma.location.findFirst({
+      where: { id }
+    })
+    if (Location) {
+      return true
+    } else { return false }
   } catch (error) {
     throw error
   }

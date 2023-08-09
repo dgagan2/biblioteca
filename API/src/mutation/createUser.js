@@ -3,7 +3,7 @@ import { v1 as uuid } from 'uuid'
 import { validarEmail, validarPassword } from '../validations/validateCreateUser.js'
 import { prisma } from '../../prisma/clientPrisma.js'
 import bcrypt from 'bcrypt'
-export async function createUser (input, prisma) {
+export async function createUser (input) {
   const { email, password, surname, residence, name, phoneNumber, age } = input
   if (!isValidEmail(email)) {
     throw new Error('Correo electrónico inválido.')
@@ -52,6 +52,7 @@ export async function createUser (input, prisma) {
     }
   }
   )
+  delete newUser.password
   return newUser
 }
 
