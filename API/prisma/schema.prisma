@@ -1,0 +1,162 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// Tablas de los libros
+
+model book {
+  id Int @id @default(autoincrement())
+  name String
+  description String?
+  editorialId editorial[]
+  authorId author[]
+  genderId gender[]
+  nPages Int?
+  editionYear String?
+  price Float?
+  idLocation Int
+  nEdition Int?
+  stock Int @default(0)
+  languageId language[]
+  bookCode String @unique
+  caratula String // debe ser un arreglo
+  location location @relation(fields: [idLocation], references: [id])
+  lending lending[]
+  createdAt DateTime @default(now())
+  updateAt DateTime?
+  deletedAd DateTime?
+}
+
+model editorial {
+  id Int @id @default(autoincrement())
+  name String @unique
+  phoneNumber String?
+  city String?
+  books book[]
+  createdAt DateTime @default(now())
+  updateAt DateTime?
+  deletedAd DateTime?
+}
+
+model author {
+  id Int @id @default(autoincrement())
+  name String
+  surname String?
+  nacionality String?
+  profilePicture String?
+  books book[]
+  createdAt DateTime @default(now())
+  updateAt DateTime?
+  deletedAd DateTime?
+}
+
+model gender {
+  id Int @id @default(autoincrement())
+  gender String @unique
+  books book[]
+  createdAt DateTime @default(now())
+  updateAt DateTime?
+  deletedAd DateTime?
+}
+
+model location {
+  id Int @id @default(autoincrement())
+  shelfNumber String @unique
+  books book[]
+  createdAt DateTime @default(now())
+  updateAt DateTime?
+  deletedAd DateTime?
+}
+
+model language {
+  id Int @id @default(autoincrement())
+  name String @unique
+  books book[]
+  createdAt DateTime @default(now())
+  updateAt DateTime?
+  deletedAd DateTime?
+}
+
+model aud_book{
+  id Int @id @default(autoincrement())
+  nameBook String
+  codeBook String
+  editedField String
+  createdAt DateTime @default(now())
+}
+
+// Tablas del usuario
+
+model profile {
+  name String
+  surname String?
+  residence String?
+  phoneNumber String?
+  age Int?
+  idUser String @unique
+  createdAt DateTime @default(now())
+  updateAt DateTime?
+  deletedAd DateTime?
+  user user @relation(fields: [idUser], references: [id])
+}
+model user{
+  id String @id
+  email String @unique
+  password String
+  idRole Int @default(2)
+  role role @relation(fields: [idRole], references: [id])
+  idState Int @default(1)
+  state state @relation(fields: [idState], references: [id])
+  profile profile?
+  lending lending[]
+  createdAt DateTime @default(now())
+  updateAt DateTime?
+  deletedAd DateTime?
+}
+model role{
+  id Int @id @default(autoincrement())
+  role String @unique
+  idUser user[]
+  createdAt DateTime @default(now())
+  updateAt DateTime?
+  deletedAd DateTime?
+}
+model state{
+  id Int @id @default(autoincrement())
+  state String @unique
+  idUser user[]
+  createdAt DateTime @default(now())
+  updateAt DateTime?
+  deletedAd DateTime?
+}
+
+model aud_login{
+  id Int @id @default(autoincrement())
+  user String
+  dateLogin DateTime @default(now())
+  dateLogout DateTime ?
+}
+// Tabla de prestamos
+
+model lending{
+  id Int @id @default(autoincrement())
+  books book[]
+  idUser String
+  user user @relation(fields: [idUser], references: [id])
+  createdAt DateTime @default(now())
+  returnAt DateTime?
+  userSession String
+  state String
+  updateAt DateTime?
+  deletedAd DateTime?
+}
+
+// Relaciones entre tablas principales
